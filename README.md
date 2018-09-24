@@ -1,2 +1,2 @@
 # EOIM-Stegen
-EPIET Outbreak Investigation Module: Copenhagen
+EPIET Outbreak Investigation Module: Stegen
