@@ -1,0 +1,525 @@
+---
+title: "MVA: An outbreak of gastroenteritis in Stegen, Germany. Logistic regression in R"
+author: "Patrick Keating (AGES), Niklas Willrich (RKI) and Alexander Spina (AGES)"
+date: "28 February 2017"
+output: word_document
+geometry: margin = 1.5cm
+
+---
+**Contributors to *R* code:**  
+Daniel Gardiner (PHE) Lukas Richter (AGES)
+
+The following code has been adapted to *R* for learning purposes. The initial contributors are listed below. All copyrights and licenses of the original document apply here as well. 
+
+**Authors:**  
+Alain Moren and Gilles Desve
+
+**Reviewers:**  
+Marta Valenciano, Alain Moren.  
+
+**Adapted for the EPIET MVA module December**  
+
+* **2015:** Alicia Barrasa (EPIET), Ioannis Karagiannis (UK-FETP)
+
+* **2016:** Alicia Barrasa (EPIET), Ioannis Karagiannis (PHE) and Thomas Inns (PHE): The use of the glm command and the mathematical representation of the models have been added
+
+* **2017:** Alicia Barrasa (EPIET) and Thomas Inns (PHE): questions were rephrased to reflect real life scenarios (rather than academic exercise)
+
+#Prerequisites#
+Participants are expected to be familiar with data management as well as descriptive and stratified analysis in R
+
+#An introduction to the R companion#
+This text was adapted from the introduction used at the 2016 TSA module.
+
+R packages are bundles of functions which extend the capability of R. Thousands of add-on packages are available in the main online repository (known as CRAN) and many more packages in development can be found on GitHub. They may be installed and updated over the Internet.  
+
+We will mainly use packages which come ready installed with R (base code), but where it makes things easier we will use add-on packages. In addition, we have included a few extra functions to simplify the code required. All the R packages you need for this case study can be installed over the Internet.  
+
+```{r, eval=FALSE, results='hide', message=FALSE, warning=FALSE}
+# Installing required packages for this case study
+required_packages <- c("foreign", "epiR", "multcomp", "broom") 
+install.packages(required_packages)
+```
+
+Run the following code at the beginning of the case study to make sure that you have made available all the packages that you need. Be sure to include it in any scripts too.  
+
+```{r, echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+# Loading required packages for the week
+required_packages <- c("foreign", "epiR", "multcomp", "broom") 
+
+for (i in seq(along = required_packages))
+  library(required_packages[i], character.only = TRUE)
+```
+
+R and Stata have minor differences in default settings and methods. In this document we will follow the Stata analysis as closely as possible, but small and usually unimportant differences may be noted between the statistical findings in R and those in Stata (e.g. in the 95% confidence intervals obtained in regression models). At some points additional steps (which would usually be optional in R) will be taken to produce output which is comparable to that of Stata.  
+
+You will work with Stata.dta data sets which can be loaded into R with the "foreign" or "readstata13" packages. The appropriate functions to use will be indicated.  
+
+R can hold one or many data sets in memory simultaneously, so there is usually no need to save intermediate files or close and re-open datasets.  
+
+
+# Session 1 - Logistic regression: adjusting for confounding
+
+## Question 8. How would you explore the effect of several risk factors? How would you account for dose response?
+
+## Help Q8  
+The objective of your multivariable analysis is to identify variables independently associated with the outcome and to control for confounding.  
+
+To prepare your dataset for multivariable analysis, you need to decide on the variables of interest based on your prevoious descriptive and stratified analysis and you might need to create or recode variables (age groups, dummy variables, etc...).  
+
+Start a new R script, name it **logistic.r** and save it in your working directory.
+Write all commands in the R script so that you can run (and re-run) it when needed during the exercise.  
+
+Open the **tiraclean.dta** dataset  
+```{r}
+tira.data <- read.dta("tiraclean.dta", convert.factors = FALSE)
+```
+
+
+#### Logistic regression using tiramisu as a dichotomous variable:  
+Using the **generalised linear model** (glm) function with the **logit link** will provide similar output to the logistic command in Stata. 
+
+
+```{r}
+# For regression analysis in R, it is important that your variables are ordered 0,1 - i.e. not as (1,0).
+# Confirming the order of the tira variable
+table(tira.data$tira)
+```
+
+```{r, message = FALSE}
+# Create logit regression model with tira as exposure variable
+
+model1 <- glm(ill~tira,
+              data = tira.data,
+              family = binomial(link = "logit"))
+
+# Gives an overview of key elements of the model
+summary(model1)
+```
+
+You can write down the above model by substituting α and β with the coefficients above.  
+ 
+
+ln(p/1-p)) is the log of the odds for the outcome    
+
+* α is the log of the odds in the unexposed  
+* β is the log of the OR for exposure x  
+
+log odds = -3.11+(4.36 * tira)  
+
+
+To obtain the ORs of your coefficients, you will need to do the following:  
+
+* save your model output as an object
+* use the tidy function of the broom package
+* exponentiate the output  
+
+```{r, message = FALSE}
+# Obtaining the key output of the regression model including ORs and CIs
+model1op <- tidy(model1, exponentiate = TRUE, conf.int = TRUE)
+model1op
+```
+
+The output of model1op is similar to what you would obtain using the **logistic** command in Stata. The estimates are the same as Stata, although there will be small differences in the 95% CI.  
+
+That model corresponds to the equation  
+odds = exp(α + βX) = $(Intercept) * exp(βX) = (Intercept) *exp(β)^X$  
+
+
+The (Intercept) is exp(α), which in cohort studies can be interpreted as the odds of being a case among the unexposed;  in case control studies the interpretation is meaningless. However, the (Intercept) is not an OR. This odds needs to be multiplied with the correct odds ratios for each exposure group to produce the odds of being a case for each exposure combination.  
+
+The OR=78.58 corresponds to exp(β) in the equation above.  
+
+
+
+#### Logistic regression using tportion as a categorical variable
+As seen below, there are **4 levels** to tportion: 0 to 3 portions.  
+
+```{r}
+# The levels of tportion
+table(tira.data$tportion)
+```
+
+R will automatically take the lowest value of tportion as the reference category.  
+
+```{r, message = FALSE}
+# Here we specify that tportion is a factor variable
+model2 <- glm(ill~factor(tportion), 
+              data = tira.data,
+              family = binomial(link = "logit"))
+
+model2op <- tidy(model2, exponentiate = TRUE, conf.int = TRUE)
+
+# The rownames of the output say "factor" because the glm model believes the var name is "factor(tportion)"
+model2op
+```
+
+We can however change the reference level (for example use 3 portions instead of 0).  
+*NB*: reference designates the index and not the value.  
+
+```{r, message=FALSE}
+# Make a new variable tportion2, where we select the 4th level as the reference
+tira.data$tportion2 <- relevel(factor(tira.data$tportion), ref = 4)
+
+# Run the logit model with this new variable
+model3 <- glm(ill ~ tportion2, 
+              data = tira.data,
+              family = binomial(link = "logit"))
+
+model3op <- tidy(model3, exponentiate = TRUE, conf.int = TRUE)
+model3op
+```
+
+What would have happened if we had included tportion without indicating that it is categorical? Try it and interpret the OR.  
+
+```{r, message=FALSE}
+# Regression using tportion as continuous variable
+model4 <- glm(ill ~ tportion,
+              data = tira.data,
+              family = binomial(link = "logit"))
+
+model4op <- tidy(model4, exponentiate = TRUE, conf.int = TRUE)
+model4op
+```
+
+Remember that the logistic equation can be expressed as:  
+odds = $(Intercept) + exp(βX) = (Intercept) + exp(β)^X$
+
+The coefficient 14.21 represents the increase in the OR with one unit increase in tportion. What would be the OR for a two-unit increase in tportion?  
+
+#### Adding a second variable to the model
+
+```{r, message=FALSE}
+# We add beer to the model
+model5 <- glm(ill ~ tira + beer,
+              data = tira.data,
+              family = binomial(link = "logit"))
+
+model5op <- tidy(model5, exponentiate = TRUE, conf.int = TRUE)
+model5op
+```
+
+Odds[illness] = $exp(α + β1X1 + β2X2 + β3X3)$   
+$= exp(α)*exp(β1X1)*exp(β2X2)$   
+$= (Intercept)*exp(β1*tira)*exp(β2*beer)$  
+
+Note that, in the above expression, tira and beer can have the values 0 or 1, according to whether they consumed tira or beer respectively.  
+
+(Intercept) = 0.063 is the odds of illness among the unexposed, i.e. among those who consumed neither tiramisu nor beer.
+
+exp(β1) = 74.02 is the OR for tiramisu adjusted by beer. The odds of illness among those who consumed tiramisu but did not drink beer is 74 times higher compared to those who consumed neither tiramisu nor beer. 
+
+exp(β2) = 0.47 is the OR for beer adjusted by tiramisu. The odds of illness among those who drank beer but did not consume tiramisu is almost half the odds of those who consumed neither tiramisu nor beer; however, this finding is not statistically significant.
+
+The odds of illness among those who ate tiramisu and beer is 74.02*0.47 times higher than among those who consumed neither.  
+
+#### Adding a third variable to the model
+We add mousse to the previous model. 
+To simplify matters, we can use the **update** function. In this way, we retain the dataset and family from the previous model and just have to specify the variables to include in the formula.  
+```{r, message=FALSE}
+model6 <- update(model5,
+                 formula = ill ~ tira + beer + mousse)
+
+model6op <- tidy(model6, exponentiate = TRUE, conf.int = TRUE)
+model6op
+```
+
+Try to write down the model and interpret all its coefficients.  
+
+
+#### Adding variables in a step-by-step fashion using the anova and chi2 test to compare different models
+
+Variables to be included in a multivariable regression model are selected on the basis of the results of the crude analysis. Variables showing an association with the outcome and having a p-value less than 0.2 are often considered eligible. The cut-off should be chosen depending on the specific situation. Often it is between 0.25 and 0.1 but higher p-values can sometimes be justified. However, if you have any reason to believe a specific variable (exposure) should be in the model (i.e. because it might be a confounder), you should include it in the model anyway. There is no golden rule in the final inclusion of variables in a multivariable analysis model, especially in outbreak investigations.  
+
+To be able to statistically check if the inclusion of a variable improves the model significantly, the models need to have the same number of observations. If you remember for some variables we had missings, meaning that each of them have a different number of observations. You need to drop all the missings.  
+
+We can do this by looping over the variables and dropping rows with NAs. 
+
+```{r, message=FALSE}
+# Drop observations with missing data 
+# List all the variables for which the missing values will be dropped
+vars <- c("ill", "tira", "age", "dmousse", "wmousse", "beer", "fruitsalad", "redjelly", "tportion", "mportion", "salmon", "mince", "tomato", "horseradish", "chickenwin", "roastbeef", "pork")
+
+# Create a new data set and assign the original data set to it!
+tira.data.new <- tira.data
+
+#Only keep the values of tira.data.new that are NOT equal to NA
+for (var in vars) {
+  tira.data.new <- tira.data.new[!is.na(tira.data.new[,var]),] 
+}
+
+# You should have 239 observations after completion of this loop
+```
+
+There are two possible strategies:  
+
+*  to start off with a model that includes only one independent variable and add others one by one
+*  to start with a full model (including all eligible variables) and, one at a time, remove variables that do not seem relevant.  
+We will begin with only one independent variable.  
+```{r, message=FALSE}
+# Only one independent variable
+model7 <- glm(ill~tira,
+                 data = tira.data.new,
+                 family = binomial(link = "logit"))
+
+model7op <- tidy(model7, exponentiate = TRUE, conf.int = TRUE)
+model7op
+```
+
+Now do a second model with one additional variable (beer). 
+
+```{r, message=FALSE}
+# As before, we can update the previous model and just write the new formula
+model8 <- update(model7, 
+                    formula = ill ~ tira +beer)
+
+model8op <- tidy(model8, exponentiate = TRUE, conf.int = TRUE)
+model8op
+```
+
+To compare two models, we will use the **anova** test, which tests for the difference in the residual deviances between the models. This is equivalent to the likelihood ratio test in Stata.   
+
+```{r, message=FALSE}
+anova(model7, model8, test = "Chisq")
+```
+
+If the anova test is statistically significant, this suggests that the addition of beer in the model significantly improves the residual deviance of this model. 
+
+The results of the anova (p = 0.0590) suggest a borderline significance (at the 0.05 level) for the addition of the variable beer. Remember this might be a confounder, so this may be a sufficient reason for which you may want to keep it in the model regardless of its p-value in the anova test.  
+
+Then extend to other variables. Proceed similarly to extend or drop the model according to the anova results.
+
+Keep or drop other variables as needed.
+Take anova, p-values, magnitude of OR, and the proportion of cases exposed into account in order to decide.
+
+#### Assessing the fit of each model, try to identify the most parsimonious model 
+Using the AIC function, we obtain the AIC value for each model. You can compare the AIC of multiple models to decide which model is the most parsimonious.  
+
+```{r, message=FALSE}
+AIC(model7, model8)
+```
+
+You can now add more variables to the model and compare the different AIC; the model with the lowest AIC value will be the most parsimonious.  
+
+
+# Session 2 - logistic regression: including interactions
+
+## Question 9. How would you account for efect modification?
+
+## Help question 9
+
+#### Perform a stratified analysis using logistic regression to check for interactions.
+First, let's remember what we saw in the stratified analysis.
+For this, we first created a 3-way table with exposure, outcome and stratifiying variables in that order and then used the epi.2by2 function to obtain the ORs (requires using the case.control method).  
+
+```{r}
+a <-  table(tira.data.new$beer, tira.data.new$ill, tira.data.new$tira)
+mh <- epi.2by2(a, method = "case.control")
+
+# We can select specific results from mh by subselecting from massoc
+
+# Crude OR
+mh$massoc$OR.crude.wald 
+
+# Stratum-specific ORs
+mh$massoc$OR.strata.wald
+
+# Adjusted OR
+mh$massoc$OR.mh.wald
+
+# We can combine all of those elements in to a single table using rbind
+results <- rbind(mh$massoc$OR.crude.wald, 
+                          mh$massoc$OR.strata.wald, 
+                          mh$massoc$OR.mh.wald)
+
+
+# We can label the rows of this table as below
+rownames(results) <- c("Crude", "Strata 0", "Strata 1", "Adjusted")
+
+results
+
+```
+
+You can obtain the same ORs using logistic regression:  
+```{r, message=FALSE}
+# No exposure to Tiramisu
+tira0 <- glm(ill ~ beer, 
+             data = tira.data.new[tira.data.new$tira == 0,],
+             family = binomial(link = "logit"))
+
+tira0op <- tidy(tira0, exponentiate = TRUE, conf.int = TRUE)
+tira0op
+
+# Exposure to Tiramisu
+tira1 <- glm(ill ~ beer, 
+             data = tira.data.new[tira.data.new$tira == 1,],
+             family = binomial(link = "logit"))
+
+tira1op <- tidy(tira1, exponentiate = TRUE, conf.int = TRUE)
+tira1op
+```
+
+Add an interaction term to the model.
+This can be generated directly in the model as below. This variable equals one if tira and beer are present at the same time. Otherwise it is zero.  
+
+```{r, message=FALSE}
+# Check for interaction between beer and tira
+tirabeer <- glm(ill ~ beer*tira, 
+                data = tira.data.new,
+                family = binomial(link = "logit"))
+
+tirabeerop <- tidy(tirabeer, exponentiate = TRUE, conf.int = TRUE)
+tirabeerop
+```
+
+the model is:  
+odds = exp(α + β1Î§1 + β2Î§2 + β3Î§3) = cons * exp(β1tira + β2beer + β3tira_beer) 
+$odds = (Intercept) * exp(β1)tira * exp(β2)beer * exp(β3)tira*beer$  
+$odds = (Intercept) * 125.12tira * 0.99beer * 0.32tira*beer$  
+
+The odds of illness among those who consumed tiramisu but did not drink beer was 125.12 times higher compared to those who consumed neither tiramisu nor beer (exposed group: those who consumed tiramisu and did not drink beer, unexposed group=those who were not exposed to tiramisu nor beer).  
+
+The odds of illness among those who drank beer but did not consume tiramisu was almost the same compared to those who consumed neither tiramisu nor beer (OR=0.99).  
+
+The odds of illness among those who drank beer and consumed tiramisu was 40 times $(0.32 * 125.13 * 0.99=40.1)$ higher compared to those who consumed neither tiramisu nor beer.  
+
+In Stata, you would normally use the **lincom** command, but in R, we will use the **glht** function from the **multcomp** package.  
+
+```{r, message=FALSE}
+#We can use names to extract the coefficient names 
+names(coef(tirabeer)) 
+
+# linfct specifies the required combination: In this case we want beer and tira and beer:tira=0
+# The odds of illness among those who drank beer and consumed tiramisu compared to those who consumed neither tiramisu nor beer
+
+a <- summary(glht(tirabeer, linfct = c("beer + tira + beer:tira = 0")))
+
+ci <- confint(a) 
+
+# Put together (cbind) a table with the exponent of the coefficients and CI, and p-value
+table_interact <- round(cbind(OR = exp(coef(a)),
+                       Interval = exp(ci$confint),
+                       Pvalue = a$test$pvalues),
+                       digits = 3)
+
+table_interact
+```
+
+#### Does the interaction term improve the fit of the model?  
+
+```{r}
+# Run the model without any interaction between beer and tira
+nointeract <- glm(ill~ tira + beer, 
+                  data = tira.data.new,
+                  family = binomial(link = "logit"))
+
+
+# Run the model with an interaction between beer and tira
+interact <- glm(ill~ tira*beer, 
+                data = tira.data.new,
+                family = binomial(link = "logit"))
+
+
+# Check the fit of the models
+anova(nointeract, interact, test = "Chisq")
+```
+
+#### Is the model with the interaction a better model?    
+
+```{r}
+AIC(nointeract, interact)
+```
+
+
+
+# Optional Session 3 - Binomial regression: dealing with RRs
+## Question 10. If you wanted to use risk ratios, how would you account for the effect of the different exposures?
+Start with the simplest model with one exposure variable only  
+
+* add one variable at a time and compare models  
+
+```{r, message=FALSE}
+# Binomial regression with one independent variable
+bin1 <- glm(ill ~ tira, 
+            data = tira.data.new,
+            family = binomial(link = "log"))
+
+bin1op <- tidy(bin1, exponentiate = TRUE, conf.int = TRUE)
+bin1op 
+
+
+# With two independent variables
+bin2 <- update(bin1,
+               formula = ill ~ tira + beer)
+
+bin2op <- tidy(bin2, exponentiate = TRUE, conf.int = TRUE)
+bin2op 
+
+
+#  Then test for the difference in the 2 models using the anova function
+anova(bin1, bin2, test = "Chisq")
+```
+
+You can now add three variables to your model.   
+```{r, eval= FALSE, message=FALSE}
+# The standard approach would be to add the 3rd variable as normal
+bin3 <- glm(ill ~ tira + beer + mousse,
+            data = tira.data.new,
+            family = binomial(link = "log"))
+
+
+```
+
+However, this model does not converge and requires specification of starting values for each coefficient in the model (i.e. for the intercept, tira, beer and mousse). The coefficients of the intercept, tira and beer from the bin2 model can be used as the starting points for those coefficients and 0 can be used for mousse (see below).  
+
+
+```{r, warning= FALSE,message=FALSE}
+# Here we save the values of the coefficients of the model
+coefini = coef(glm(ill ~ tira + beer,
+                   data = tira.data.new,
+                   family = binomial(link = "log")))
+
+# In bin3, you use the coefficents from bin2 as starting points to facilitate converging of the model
+bin3 <- glm(ill ~ tira + beer + mousse,
+           data = tira.data.new,
+           family = binomial(link = "log"),
+           start = c(coefini,0))
+
+bin3op <- tidy(bin3, exponentiate = TRUE, conf.int = TRUE)
+bin3op
+```
+
+```{r}
+# Assessing the fit of each model
+AIC(bin1,bin2,bin3)
+```
+  
+You can now check to see if an interaction between tira and beer improves the model.
+The model that includes an interaction  will also not converge without specifying starting points. The starting values added below were obtained from the simpler model without the interaction term. As before, a value of 0 was used as the starting point for the new component (interaction term) of the model.  
+
+```{r}
+# check if the interaction improves the model 
+nointeract_binom <- glm(ill~ tira + beer, 
+                        data = tira.data.new,
+                        family = binomial(link = "log"))
+
+
+interact_binom <- glm(ill~ tira*beer, 
+                      data = tira.data.new,
+                      family = binomial(link = "log"),
+                      start = c(-2.9136, 2.7694, -0.2425, 0))
+
+
+anova(nointeract_binom, interact_binom, test = "Chisq")
+```
+
+You can identify the most parsimonious model using the AIC.  
+```{r}
+# Assessing the fit of each model
+AIC(nointeract_binom, interact_binom)
+```
+
+
+
+
+
