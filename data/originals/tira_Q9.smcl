@@ -1,0 +1,249 @@
+{smcl}
+{txt}{sf}{ul off}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}N:\MED\IMED-VIE\INFE\Public\CC-INFE-Schmid\EPIET\Learning R\R Case studies\MVA module 2016\Logistic Regression\tira_Q9.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}28 Feb 2017, 16:51:12
+{txt}
+{com}. use tiranomissing.dta, replace
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\patric15\AppData\Local\Temp\STD04000000.tmp"
+{txt}
+{com}. logistic ill tira##beer 
+{res}
+{txt}Logistic regression{col 51}Number of obs{col 67}= {res}       239
+{txt}{col 51}LR chi2({res}3{txt}){col 67}= {res}    160.38
+{txt}{col 51}Prob > chi2{col 67}= {res}    0.0000
+{txt}Log likelihood = {res}-74.767616{txt}{col 51}Pseudo R2{col 67}= {res}    0.5175
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}         ill{col 14}{c |} Odds Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}tira {c |}
+{space 8}Yes  {c |}{col 14}{res}{space 2}  125.125{col 26}{space 2} 79.84679{col 37}{space 1}    7.57{col 46}{space 3}0.000{col 54}{space 4} 35.82297{col 67}{space 3} 437.0454
+{txt}{space 12} {c |}
+{space 8}beer {c |}
+{space 8}Yes  {c |}{col 14}{res}{space 2} .9956897{col 26}{space 2} .7799255{col 37}{space 1}   -0.01{col 46}{space 3}0.996{col 54}{space 4} .2144748{col 67}{space 3} 4.622444
+{txt}{space 12} {c |}
+{space 3}tira#beer {c |}
+{space 4}Yes#Yes  {c |}{col 14}{res}{space 2} .3219004{col 26}{space 2} .3021624{col 37}{space 1}   -1.21{col 46}{space 3}0.227{col 54}{space 4} .0511344{col 67}{space 3} 2.026422
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0519481{col 26}{space 2} .0266401{col 37}{space 1}   -5.77{col 46}{space 3}0.000{col 54}{space 4} .0190131{col 67}{space 3} .1419334
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. di 0.32*125.13*0.99
+{res}39.641184
+{txt}
+{com}. 
+. lincom 1.tira + 1.beer + tira##beer
+{err}tira##beer invalid name
+{txt}{search r(198):r(198);}
+
+end of do-file
+
+{search r(198):r(198);}
+
+{com}. do "C:\Users\patric15\AppData\Local\Temp\STD04000000.tmp"
+{txt}
+{com}. glm ill tira beer, link(logit) eform nolog
+{res}
+{txt}Generalized linear models{col 52}No. of obs{col 68}={col 70}{res}      239
+{txt}Optimization     : {res}ML{txt}{col 52}Residual df{col 68}={col 70}{res}      236
+{col 20}{txt}{col 52}Scale parameter{col 68}={col 70}{res} .0921799
+{txt}Deviance{col 18}={res}{col 20}  21.7544637{txt}{col 52}(1/df) Deviance{col 68}={res}{col 70} .0921799
+{txt}Pearson{col 18}={res}{col 20}  21.7544637{txt}{col 52}(1/df) Pearson{col 68}={res}{col 70} .0921799
+
+{txt}Variance function: {res}V(u) = {col 27}1{col 52}{txt}[{res}Gaussian{txt}]
+Link function    : {res}g(u) = {col 27}ln(u/(1-u)){col 52}{txt}[{res}Logit{txt}]
+
+{col 52}{help j_glmic##|_new:AIC}{col 68}={res}{col 70} .4663371
+{txt}Log likelihood{col 18}= {res}-52.72728117{txt}{col 52}{help j_glmic##|_new:BIC}{col 68}={res}{col 70}-1270.691
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}      OIM
+{col 1}         ill{col 14}{c |}     exp(b){col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}tira {c |}{col 14}{res}{space 2} 102.4032{col 26}{space 2} 70.26339{col 37}{space 1}    6.75{col 46}{space 3}0.000{col 54}{space 4} 26.68497{col 67}{space 3} 392.9712
+{txt}{space 8}beer {c |}{col 14}{res}{space 2} .3409222{col 26}{space 2} .1367198{col 37}{space 1}   -2.68{col 46}{space 3}0.007{col 54}{space 4} .1553455{col 67}{space 3} .7481901
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0608764{col 26}{space 2} .0363572{col 37}{space 1}   -4.69{col 46}{space 3}0.000{col 54}{space 4} .0188837{col 67}{space 3} .1962508
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. estat ic
+
+Akaike's information criterion and Bayesian information criterion
+
+{txt}{hline 13}{c TT}{hline 63}
+       Model {c |}    Obs    ll(null)   ll(model)     df          AIC         BIC
+{hline 13}{c +}{hline 63}
+{ralign 12:.}{col 14}{c |}{res}{col 17}  239{col 25}        .{col 37}-52.72728{col 48}    3{col 57} 111.4546{col 69}  121.884
+{txt}{hline 13}{c BT}{hline 63}
+{p 15 22 2}
+Note:  N=Obs used in calculating BIC; see {helpb bic_note:[R] BIC note}
+{p_end}
+
+{com}. glm ill tira##beer, link(logit) eform nolog
+{res}
+{txt}Generalized linear models{col 52}No. of obs{col 68}={col 70}{res}      239
+{txt}Optimization     : {res}ML{txt}{col 52}Residual df{col 68}={col 70}{res}      235
+{col 20}{txt}{col 52}Scale parameter{col 68}={col 70}{res}  .092325
+{txt}Deviance{col 18}={res}{col 20} 21.69636959{txt}{col 52}(1/df) Deviance{col 68}={res}{col 70}  .092325
+{txt}Pearson{col 18}={res}{col 20} 21.69636959{txt}{col 52}(1/df) Pearson{col 68}={res}{col 70}  .092325
+
+{txt}Variance function: {res}V(u) = {col 27}1{col 52}{txt}[{res}Gaussian{txt}]
+Link function    : {res}g(u) = {col 27}ln(u/(1-u)){col 52}{txt}[{res}Logit{txt}]
+
+{col 52}{help j_glmic##|_new:AIC}{col 68}={res}{col 70} .4720313
+{txt}Log likelihood{col 18}= {res}-52.40773611{txt}{col 52}{help j_glmic##|_new:BIC}{col 68}={res}{col 70}-1265.273
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}      OIM
+{col 1}         ill{col 14}{c |}     exp(b){col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}tira {c |}
+{space 8}Yes  {c |}{col 14}{res}{space 2}  125.125{col 26}{space 2} 99.50802{col 37}{space 1}    6.07{col 46}{space 3}0.000{col 54}{space 4} 26.32752{col 67}{space 3} 594.6729
+{txt}{space 12} {c |}
+{space 8}beer {c |}
+{space 8}Yes  {c |}{col 14}{res}{space 2} .9956897{col 26}{space 2} 1.094979{col 37}{space 1}   -0.00{col 46}{space 3}0.997{col 54}{space 4} .1153562{col 67}{space 3} 8.594229
+{txt}{space 12} {c |}
+{space 3}tira#beer {c |}
+{space 4}Yes#Yes  {c |}{col 14}{res}{space 2} .3219003{col 26}{space 2} .3776784{col 37}{space 1}   -0.97{col 46}{space 3}0.334{col 54}{space 4} .0322869{col 67}{space 3} 3.209349
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .0519481{col 26}{space 2} .0373599{col 37}{space 1}   -4.11{col 46}{space 3}0.000{col 54}{space 4} .0126883{col 67}{space 3}  .212684
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. estat ic
+
+Akaike's information criterion and Bayesian information criterion
+
+{txt}{hline 13}{c TT}{hline 63}
+       Model {c |}    Obs    ll(null)   ll(model)     df          AIC         BIC
+{hline 13}{c +}{hline 63}
+{ralign 12:.}{col 14}{c |}{res}{col 17}  239{col 25}        .{col 37}-52.40774{col 48}    4{col 57} 112.8155{col 69} 126.7213
+{txt}{hline 13}{c BT}{hline 63}
+{p 15 22 2}
+Note:  N=Obs used in calculating BIC; see {helpb bic_note:[R] BIC note}
+{p_end}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\patric15\AppData\Local\Temp\STD04000000.tmp"
+{txt}
+{com}. use tiranomissing.dta, replace
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\patric15\AppData\Local\Temp\STD04000000.tmp"
+{txt}
+{com}. glm ill tira, family(binomial) link(log) eform 
+{res}
+{txt}Iteration 0:{space 3}log likelihood = {res:-119.09794}  
+Iteration 1:{space 3}log likelihood = {res: -85.76198}  
+Iteration 2:{space 3}log likelihood = {res:-79.132559}  
+Iteration 3:{space 3}log likelihood = {res:-77.270909}  
+Iteration 4:{space 3}log likelihood = {res:-77.253292}  
+Iteration 5:{space 3}log likelihood = {res:-77.253278}  
+Iteration 6:{space 3}log likelihood = {res:-77.253278}  
+{res}
+{txt}Generalized linear models{col 52}No. of obs{col 68}={col 70}{res}      239
+{txt}Optimization     : {res}ML{txt}{col 52}Residual df{col 68}={col 70}{res}      237
+{col 20}{txt}{col 52}Scale parameter{col 68}={col 70}{res}        1
+{txt}Deviance{col 18}={res}{col 20}  154.506556{txt}{col 52}(1/df) Deviance{col 68}={res}{col 70} .6519264
+{txt}Pearson{col 18}={res}{col 20}         239{txt}{col 52}(1/df) Pearson{col 68}={res}{col 70} 1.008439
+
+{txt}Variance function: {res}V(u) = {col 27}u*(1-u){col 52}{txt}[{res}Bernoulli{txt}]
+Link function    : {res}g(u) = {col 27}ln(u){col 52}{txt}[{res}Log{txt}]
+
+{col 52}{help j_glmic##|_new:AIC}{col 68}={res}{col 70} .6632073
+{txt}Log likelihood{col 18}= {res}-77.25327801{txt}{col 52}{help j_glmic##|_new:BIC}{col 68}={res}{col 70}-1143.415
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}      OIM
+{col 1}         ill{col 14}{c |} Risk Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}tira {c |}{col 14}{res}{space 2} 16.10309{col 26}{space 2} 5.992701{col 37}{space 1}    7.47{col 46}{space 3}0.000{col 54}{space 4} 7.764939{col 67}{space 3} 33.39493
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0492958{col 26}{space 2}  .018167{col 37}{space 1}   -8.17{col 46}{space 3}0.000{col 54}{space 4} .0239395{col 67}{space 3} .1015088
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\patric15\AppData\Local\Temp\STD04000000.tmp"
+{txt}
+{com}. glm ill tira beer, family(binomial) link(log) eform 
+{res}
+{txt}Iteration 0:{space 3}log likelihood = {res: -128.4627}  
+Iteration 1:{space 3}log likelihood = {res:-95.236902}  
+Iteration 2:{space 3}log likelihood = {res:-87.014484}  
+Iteration 3:{space 3}log likelihood = {res:-78.699504}  
+Iteration 4:{space 3}log likelihood = {res:-75.874747}  
+Iteration 5:{space 3}log likelihood = {res: -74.83952}  
+Iteration 6:{space 3}log likelihood = {res:-74.819464}  
+Iteration 7:{space 3}log likelihood = {res:-74.819429}  
+Iteration 8:{space 3}log likelihood = {res:-74.819429}  
+{res}
+{txt}Generalized linear models{col 52}No. of obs{col 68}={col 70}{res}      239
+{txt}Optimization     : {res}ML{txt}{col 52}Residual df{col 68}={col 70}{res}      236
+{col 20}{txt}{col 52}Scale parameter{col 68}={col 70}{res}        1
+{txt}Deviance{col 18}={res}{col 20} 149.6388575{txt}{col 52}(1/df) Deviance{col 68}={res}{col 70}  .634063
+{txt}Pearson{col 18}={res}{col 20}  240.988453{txt}{col 52}(1/df) Pearson{col 68}={res}{col 70} 1.021138
+
+{txt}Variance function: {res}V(u) = {col 27}u*(1-u){col 52}{txt}[{res}Bernoulli{txt}]
+Link function    : {res}g(u) = {col 27}ln(u){col 52}{txt}[{res}Log{txt}]
+
+{col 52}{help j_glmic##|_new:AIC}{col 68}={res}{col 70} .6512086
+{txt}Log likelihood{col 18}= {res}-74.81942876{txt}{col 52}{help j_glmic##|_new:BIC}{col 68}={res}{col 70}-1142.807
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}      OIM
+{col 1}         ill{col 14}{c |} Risk Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}tira {c |}{col 14}{res}{space 2} 15.94861{col 26}{space 2} 5.933944{col 37}{space 1}    7.44{col 46}{space 3}0.000{col 54}{space 4} 7.691642{col 67}{space 3} 33.06941
+{txt}{space 8}beer {c |}{col 14}{res}{space 2} .7846728{col 26}{space 2}  .095566{col 37}{space 1}   -1.99{col 46}{space 3}0.046{col 54}{space 4} .6180449{col 67}{space 3} .9962244
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0542823{col 26}{space 2} .0201429{col 37}{space 1}   -7.85{col 46}{space 3}0.000{col 54}{space 4}   .02623{col 67}{space 3} .1123361
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\patric15\AppData\Local\Temp\STD04000000.tmp"
+{txt}
+{com}. glm ill tira beer mousse, family(binomial) link(log) eform 
+{res}
+{txt}Iteration 0:{space 3}log likelihood = {res:-291.98952}  (not concave)
+Iteration 1:{space 3}log likelihood = {res:-84.494578}  
+Iteration 2:{space 3}log likelihood = {res:-76.098796}  
+Iteration 3:{space 3}log likelihood = {res:-74.532785}  
+Iteration 4:{space 3}log likelihood = {res:-74.529176}  
+Iteration 5:{space 3}log likelihood = {res:-74.529175}  
+{res}
+{txt}Generalized linear models{col 52}No. of obs{col 68}={col 70}{res}      239
+{txt}Optimization     : {res}ML{txt}{col 52}Residual df{col 68}={col 70}{res}      235
+{col 20}{txt}{col 52}Scale parameter{col 68}={col 70}{res}        1
+{txt}Deviance{col 18}={res}{col 20} 149.0583501{txt}{col 52}(1/df) Deviance{col 68}={res}{col 70} .6342909
+{txt}Pearson{col 18}={res}{col 20} 231.1790621{txt}{col 52}(1/df) Pearson{col 68}={res}{col 70} .9837407
+
+{txt}Variance function: {res}V(u) = {col 27}u*(1-u){col 52}{txt}[{res}Bernoulli{txt}]
+Link function    : {res}g(u) = {col 27}ln(u){col 52}{txt}[{res}Log{txt}]
+
+{col 52}{help j_glmic##|_new:AIC}{col 68}={res}{col 70} .6571479
+{txt}Log likelihood{col 18}= {res}-74.52917507{txt}{col 52}{help j_glmic##|_new:BIC}{col 68}={res}{col 70}-1137.911
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}      OIM
+{col 1}         ill{col 14}{c |} Risk Ratio{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}tira {c |}{col 14}{res}{space 2} 14.69177{col 26}{space 2} 5.765273{col 37}{space 1}    6.85{col 46}{space 3}0.000{col 54}{space 4}  6.80847{col 67}{space 3} 31.70286
+{txt}{space 8}beer {c |}{col 14}{res}{space 2} .8176485{col 26}{space 2} .1075164{col 37}{space 1}   -1.53{col 46}{space 3}0.126{col 54}{space 4} .6318852{col 67}{space 3} 1.058023
+{txt}{space 6}mousse {c |}{col 14}{res}{space 2} 1.126678{col 26}{space 2} .1932222{col 37}{space 1}    0.70{col 46}{space 3}0.487{col 54}{space 4} .8050463{col 67}{space 3} 1.576807
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0527514{col 26}{space 2} .0196939{col 37}{space 1}   -7.88{col 46}{space 3}0.000{col 54}{space 4} .0253777{col 67}{space 3} .1096519
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+{txt}end of do-file
+
+{com}. exit, clear
