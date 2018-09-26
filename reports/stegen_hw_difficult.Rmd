@@ -63,12 +63,12 @@ We will mainly use packages which come ready installed with R (base code), but w
 * epiDisplay
 * epiR
 * survival
-* readstata13
 * ISOweek
 * multcomp
 * epitools
 * broom
-* haven
+* ~~haven~~
+* ~~readstata13~~
 
 Install and load the required R packages for this practical.
 
@@ -129,6 +129,26 @@ Describe your dataset:
 * make appropriate histograms and box plots
 * make sure that your missing values are properly coded as missing (i.e. as opposed to "9")
 
+### a) Browse your dataset.
+What variables does your dataset contain?
+
+### b) Describe your dataset.
+Look at: 
+
+* the number of observations and variable types
+* mean, median, and maximum values for each variable
+
+### c) Recode data.
+Identify variables with missing values (variables that have a records with a value of 9). Recode these to NA.
+
+### d) Create summary tables with counts and proportions.
+For each variable in the dataset.
+
+### e) Make a box plot and histogram of age.
+
+### f) Number of cases by date of onset.
+Use the incidence package to create an epicurve for this outbreak, providing information on daily incidence. Also create an epicurve stratified by sex.
+
 # Help Q1
 
 ### Browsing your dataset 
@@ -153,7 +173,7 @@ str(tira_data)
 summary(tira_data)
 
 # describe (from Hmisc package) provides no. of observations, missing values, unique levels of each variable
-describe(tira_data) 
+Hmisc::describe(tira_data) 
 ```
 
 
