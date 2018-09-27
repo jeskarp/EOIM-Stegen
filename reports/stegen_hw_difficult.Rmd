@@ -1,0 +1,519 @@
+---
+title: "MVA Case study in R: An outbreak of gastroenteritis in Stegen, Germany"
+author: "Niklas Willrich (RKI), Patrick Keating (AGES),  and Alexander Spina (AGES)"
+date: "27 February 2017"
+output: pdf_document
+geometry: margin = 1.5cm
+
+---
+**Contributors to *R* code:**  
+Daniel Gardiner (PHE) and Lukas Richter (AGES)
+
+The following code has been adapted to *R* for learning purposes. The initial contributors are listed below. All copyrights and licenses of the original document apply here as well. 
+
+**Authors:**  
+Alain Moren and Gilles Desve
+
+**Reviewers:**  
+Marta Valenciano, Alain Moren.  
+
+**Adapted for the EPIET MVA module December**  
+**2015:** Alicia Barrasa (EPIET), Ioannis Karagiannis (UK-FETP)
+
+#Prerequisites#
+Participants are expected to be familiar with data management and basic analysis in R
+
+\newpage
+#Introduction#
+On 26 June 1998, the St Sebastian High School in Stegen (school A), Germany, celebrated a graduation party, where 250 to 350 participants were expected. Attendants included graduates from that school, their families and friends, teachers, 12th grade students and some graduates from a nearby school (school B).
+
+A self-service party buffet was supplied by a commercial caterer in Freiburg. Food was prepared the day of the party and transported in a refrigerated van to the school.
+
+Festivities started with a dinner buffet open from 8.30 pm onwards and were followed by a dessert buffet offered from 10 pm. The party and the buffet extended late during the night and alcoholic beverages were quite popular. All agreed it was a party to be remembered.
+
+#The alert#
+On 2nd July 1998, the Freiburg local health office reported to the Robert Koch Institute (RKI) in Berlin the occurrence of many cases of gastroenteritis following the graduation party described above. More than 100 cases were suspected among participants and some of them were admitted to nearby hospitals. Sick people suffered from fever, nausea, diarrhoea and vomiting lasting for several days. Most believed that the tiramisu consumed at dinner was responsible for their illness. *Salmonella enteritidis* was isolated from 19 stool samples.
+
+The Freiburg health office sent a team to investigate the kitchen of the caterer. Food preparation procedures were reviewed. Food samples, except tiramisu (none was left over), were sent to the laboratory of Freiburg University. Microbiological analyses were performed on samples of the following: brown chocolate mousse, caramel cream, remoulade sauce, yoghurt dill sauce, and 10 raw eggs.
+
+The Freiburg health office requested help from the RKI in the investigation to assess the magnitude of the outbreak and identify potential vehicle(s) and risk factors for transmission in order to better control the outbreak
+
+#The study#
+Cases were defined as any person who had attended the party at St Sebastian High School who suffered from diarrhoea
+(min. 3 loose stool for 24 hours) between 27 June and 29 June 1998; or who suffered from at least three of the following symptoms: vomiting, fever over 38.5° C, nausea, abdominal pain, headache.
+
+Students from both schools attending the party were asked through phone interviews to provide names of persons who
+attended the party.
+
+Overall, 291 responded to enquiries and 103 cases were identified.
+
+\newpage
+#An introduction to the R companion#
+This text was adapted from the introduction used at the 2016 TSA module.
+
+R packages are bundles of functions which extend the capability of R. Thousands of add-on packages are available in the main online repository (known as CRAN) and many more packages in development can be found on GitHub. They may be installed and updated over the Internet.
+
+We will mainly use packages which come ready installed with R (base code), but where it makes things easier we will use add-on packages. In addition, we have included a few extra functions to simplify the code required. All the R packages you need for the exercises can be installed over the Internet.
+
+#Setting up#
+
+### Required R packages and functions
+* here
+* Hmisc
+* epiDisplay
+* epiR
+* survival
+* ISOweek
+* multcomp
+* epitools
+* broom
+* ~~haven~~
+* ~~readstata13~~
+
+Install and load the required R packages for this practical.
+
+```{r, echo = FALSE, eval = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+# Installing required packages for the week
+required_packages <- c("haven", "foreign", "Hmisc", "epiDisplay", "epiR", "survival","readstata13","ISOweek", "multcomp", "epitools", "broom", "xlsx") 
+install.packages(required_packages)
+
+for (i in seq(along = required_packages))
+```
+
+```{r, echo = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+# Loading required packages for the week
+required_packages <- c("haven", "foreign", "Hmisc", "epiDisplay", "epiR", "survival","readstata13", "ISOweek", "multcomp", "epitools", "broom", "readstata13", "openxlsx") 
+
+for (i in seq(along = required_packages))
+  library(required_packages[i], character.only = TRUE)
+```
+
+Run the following code to make sure that you have all the functions that you need for this practical.
+
+```{r}
+# Function to make tables with counts, proportions and cumulative sum
+big_table <- function(data, useNA = "no") {
+  count <- table(data, useNA = useNA)
+  prop <- round(prop.table(count)*100, digits = 2)
+  cumulative <- cumsum(prop)
+  rbind(count,
+        prop,
+        cumulative) 
+}
+
+ # Function to provide counts, denominator and proportions (equivalent of attack rate)
+attack_rate <- function(table) {
+  prop <- round(prop.table(table, 1), digits = 2)
+  denominator <- rowSums(table) 
+  output <- cbind(Ill = table[, 2], N = denominator, Proportions = prop[, 2])
+  return(output)
+}
+```
+
+The big_table function uses data directly and allows combining of counts, proportions and cumulative sums, thus reducing the number of lines of code required for descriptive analyses. The attack_rate function makes tables that combine counts, proportions and row sums.
+
+### The dataset
+
+In this practical, we will be using the tirav12.csv file located in the data folder.
+
+Read in the dataset for this practical.
+
+```{r, echo = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+tira_data <- read.csv(here::here("data", "tirav12.csv"), stringsAsFactors = FALSE)
+```
+
+# Question 1. What are the main characteristics of the study population?
+Describe your dataset: 
+
+* frequency distributions, means, medians, modes, quartiles, SD, quartiles, outliers
+* make appropriate histograms and box plots
+* make sure that your missing values are properly coded as missing (i.e. as opposed to "9")
+
+### a) Browse your dataset.
+What variables does your dataset contain?
+
+### b) Describe your dataset.
+Look at: 
+
+* the number of observations and variable types
+* mean, median, and maximum values for each variable
+
+### c) Recode data.
+Identify variables with missing values (variables that have a records with a value of 9). Recode these to NA.
+
+### d) Create summary tables with counts and proportions.
+For each variable in the dataset.
+
+### e) Make a box plot and histogram of age.
+
+### f) Number of cases by date of onset.
+Use the incidence package to create an epicurve for this outbreak, providing information on daily incidence. Also create an epicurve stratified by sex.
+
+# Help Q1
+
+### Browsing your dataset 
+*RStudio* has the nice feature that everything is in one browser window, so you can browse your dataset and your code without having to switch between browser windows. 
+
+```{r, eval = FALSE}
+# to browse your data, use the View command
+View(tira_data)
+```
+
+Alternatively, you can also view your dataset by clicking on **tira_data** in the top right "global environment" panel of your *RStudio* browser.  Your global environment is where you can see all the datasets, functions and other things you have loaded in the current session. 
+
+
+### Describing your dataset 
+You can view the structure of your data set using the following commands:
+
+```{r, eval = FALSE}
+# str provides an overview of the number of observations and variable types
+str(tira_data)
+
+# summary provides mean, median and max values of your variables
+summary(tira_data)
+
+# describe (from Hmisc package) provides no. of observations, missing values, unique levels of each variable
+Hmisc::describe(tira_data) 
+```
+
+
+"table", "summary",  and "describe" functions provide similar output to the "tabulate", "summarize", and "codebook" commands in Stata.
+
+"Summary" and "describe" can be applied to:  
+
+* the whole dataset
+* specific variables of interest  
+
+In the example below we look at sex, age and pork in the **tira_data** dataset. You can examine a variable within a dataset using the '$' sign followed by the variable name. 
+
+
+```{r, eval = FALSE}
+# table will give a very basic frequency table (counts), 
+table(tira_data$sex)
+
+# summary gives the mean, median and max values of the specified variable
+summary(tira_data$age)
+
+# describe gives the number of data points, missing values and number of categories
+describe(tira_data$pork)
+
+```
+
+### Recode the data 
+Use the "describe" command to assess your data and identify variables with missing values. The describe command showed that the variables salmon, pork and horseradish have a few records with a value of 9. These need to be recoded to NA
+
+* Using the square brackets "[...]" after a variable allows you to subset for certain observations. To recode values of 9 to NA for the pork variable, select observations where pork **(tira_data\$pork)** is equal to 9 **[tira_data\$pork == 9]** and set these observations equal to NA 
+    
+* Always use the double equals "==" within square brackets; this a logical (Boolean) operator
+
+* Use "! = " when you want to write "not equal to"
+
+```{r, eval = FALSE}
+# The first line below is read as follows:  assign a value of NA to tira_data$pork WHERE tira_data$pork is equal to 9
+tira_data$pork[tira_data$pork == 9] <- NA
+
+tira_data$salmon[tira_data$salmon == 9] <- NA
+
+tira_data$horseradish[tira_data$horseradish == 9] <- NA
+```
+
+### Create summary tables with counts and proportions 
+We can create individual tables for each variable with the following steps:
+
+```{r, eval = FALSE}
+# Assign the counts of tira_data$sex to the object "sex"
+sex <- table(tira_data$sex)
+
+# Assign the proportion of tira_data$sex to the object "prop" and round the values to 2 decimal places
+prop <- round(prop.table(sex)*100, digits = 2)
+
+# Assign the cumulative sum of tira_data$sex to the object "cumul"
+cumul <- cumsum(prop)
+
+# Append/row bind the results of the three objects together and assign to the object table1
+table1 <- rbind(sex,prop,cumul)
+```
+
+```{r, eval = FALSE}
+table1
+```
+
+We could also use the big_table function (on page 2), which does all of the above steps in one line.
+
+```{r, eval = FALSE}
+big_table(tira_data$sex)
+
+big_table(tira_data$beer)
+```
+
+We could use the big_table function on each of our variables, or we could use a **for loop** to loop through our variables (similar to Stata) with the big_table function.
+
+```{r, eval = FALSE}
+# List the variables of interest and use c() to combine the elements into a vector
+vars <- c("ill", "tira", "beer", "pork", "salmon")
+
+# Create an empty list to hold the output of your loop
+output <- list() 
+
+# Apply big_table to each element of the object in vars. In this loop, "var" is the indexing variable; any character can be used e.g. "i"
+for (var in vars) {
+  # Within the [], the item before the comma refers to rows and the item after the comma refers to columns
+  total <- big_table(tira_data[,var])
+  # assign the value of your tables (total) to the output list (note: double square brackets "[[]]" are used to subset elements of a list)
+  output[[var]] <- total
+}
+
+output
+```
+
+### Make a box plot and histogram of age
+You can use the following to examine the age distribution among people who attended the party, as well as only those and who fell ill and additionally to save the chart. 
+
+```{r, eval = FALSE}
+# Boxplot of the age of all who attended the party
+boxplot(tira_data$age)
+```
+
+
+```{r, eval = FALSE}
+# Histogram of the ages of those who attended the party and who fell ill
+
+# To save the histogram, the file path and filename must be specified prior to running the histogram code
+
+# This function changes the "graphics device" to jpeg. You can view the current graphics device using dev.curr().  The default in R Studio is "RStudioGD", i.e. the viewing panel where plots normally occ
+
+jpeg(filename = "N:/MED/IMED-VIE/INFE/Public/CC-INFE-Schmid/EPIET/Learning R/R Case studies/MVA module 2016/Homework/age_cases.jpeg")
+
+# Here we use the hist function to plot the age of cases only (ill == 1)
+# You will see that RStudio creates a jpeg file in your working directory with the above path and filename.
+age_hist_all <- hist(tira_data$age[tira_data$ill == 1],
+                     xlab = "Age",
+                     ylab = "No. of cases",
+                   main = "Histogram of the ages of cases")
+
+# This function closes the graphics device and returns to the default
+dev.off()
+```
+
+```{r, echo = FALSE}
+age_hist_all <- hist(tira_data$age[tira_data$ill == 1],
+                     xlab = "Age",
+                     ylab = "No. of cases",
+                   main = "Histogram of the ages of cases")
+
+```
+
+If we believe that there are two identifiable age groups, then we can create a new age group variable using **one** of the following approaches:
+
+```{r, eval = FALSE}
+# by using ifelse (similar to Excel if statements)
+tira_data$agegroup <- ifelse(tira_data$age >= 30, 1, 0)
+```
+```{r, eval = FALSE}
+# Two alternative approaches
+# The below are particularly useful when you want to create more than 2 categories
+# by using cut
+tira_data$agegroup <- cut(tira_data$age, c(0,30,150), labels = FALSE) - 1
+# by using findInterval ( levels start at 1, so we have to subtract 1)
+tira_data$agegroup <- findInterval(tira_data$age, c(0,30,150)) - 1
+
+```
+
+
+### Describe the outbreak in terms of person and time
+You can produce summary tables by person and time (no place variable provided) using the big_table function.
+
+```{r, eval = FALSE}
+# Table 1: Descriptive epidemiology: Study population by sex
+big_table(tira_data$sex)
+
+# Table 2: Descriptive epidemiology: Study population by age group
+# useNA ="always" here allows you to see the proportion of NAs for this variable
+big_table(tira_data$agegroup, useNA = "always")
+
+summary(tira_data$age)
+        
+
+# Table 3: Descriptive epidemiology: Attack rate
+big_table(tira_data$ill)
+
+
+# Table 4: Descriptive epidemiology: Cases by date of onset of illness
+big_table(tira_data$dateonset)
+```
+
+\newpage
+# Question 2:  What is/are the vehicle/s for this outbreak?
+### a) Compute food-specific attack rates and % of cases exposed
+### b) Choose the appropriate measure of association and the appropriate statistical tests and appropriate level of confidence: 
+### c) Look at the proportion of cases exposed. What would be your suspected food item at this point?
+### d) Compute the proportion of cases exposed for each exposure
+
+## Help questions 2a to d
+
+As we are carrying out a cohort study, the appropriate measure of association is relative risk. The appropriate statistical test for determining a p-value is a Chi2 test of comparison of proportions. For our analyses we will use a 95% confidence level, as this is the standard used in public health.
+
+
+The outputs required for a, c and d are provided by the same function as described below. In Stata, we would normally use the **cstable** and **csinter** commands to calculate food-specific attack rates and the proportion of cases exposed to specific exposures. There are a number of ways of doing this in R. Below you will see two approaches. The first approach gives us the % of cases exposed to tiramisu. 
+
+
+```{r, eval = FALSE}
+# The first element will be rows and the 2nd will be columns
+count <- table(tira_data$tira,tira_data$ill, deparse.level = 2)
+
+# Here we select row % of count by including ,1 in the prop.table section
+prop <- round(prop.table(count,1),digits = 2) 
+
+# We obtain the denominator using the rowSums function
+denominator <- rowSums(count) 
+
+# We combine all the elements together using cbind (binding by columns)
+tira <- cbind(Ill = count[,2], N = denominator, Proportions = prop[,2])
+tira
+```
+
+Alternatively, we can use a user-written command called single variable analysis.v.02 (developed by Daniel Gardiner Cohort 2015). This gives similar output to the cstable command in Stata.
+
+```{r, eval = FALSE}
+# This function needs to be saved in the same folder as the working directory
+source("single.variable.analysis.v0.2.R") 
+```
+
+```{r, eval = FALSE}
+# specify your exposures of interest i.e. tira-pork
+vars <- c("tira", "wmousse", "dmousse", "mousse", "beer", "redjelly", "fruitsalad", "tomato", "mince", "salmon", "horseradish", "chickenwin", "roastbeef", "pork")
+```
+
+```{r, eval = FALSE, message=FALSE, warning=FALSE}
+#NB. click on "sva" in your global environment to view Daniel's source code and read his explanations
+a <- sva(tira_data, outcome = "ill", exposures = c(vars), measure = "rr", verbose = TRUE)
+a
+```
+
+To calculate attack rates for age and sex, you can use the attack_rate function. 
+
+```{r, eval = FALSE}
+# the attack_rate function acts on tables and not data (as in the big_table function)
+counts_sex <- table(tira_data$sex, tira_data$ill)
+attack_rate(counts_sex)
+
+counts_age <- table(tira_data$agegroup, tira_data$ill)
+attack_rate(counts_age)
+
+```
+
+### e) Search for any dose response if appropriate
+Use the variable tportion and tabulate it. Consider whether you would recode this variable so it has fewer categories, and actually do it. 
+
+
+```{r, eval = FALSE}
+# Tabulate tportion variable against illness using attack_rate function
+counts_tportion <- table(tira_data$tportion, tira_data$ill)
+attack_rate(counts_tportion)
+```
+```{r, eval = FALSE}
+# Recode 3 portions of tportion as 2 portions
+# Make a new variable called tportion2 that has the same values as tportion
+tira_data$tportion2 <- tira_data$tportion
+tira_data$tportion2[tira_data$tportion2 == 3] <- 2
+```
+```{r, eval = FALSE}
+# Calculate counts, proportions and sum of recoded tportion2
+counts_tportion2 <- table(tira_data$tportion2,tira_data$ill)
+attack_rate(counts_tportion2)
+```
+
+Here you should be able to see that those who ate 2 or more portions of tiramisu have a higher attack rate than those that ate only 1 portion of tiramisu. Those who ate 1 portion of tiramisu have a higher attack rate than those who ate no tiramisu.
+
+### f) Interpret the results and identify the outbreak vehicle if any.
+Refer to the results of the **sva** output and identify likely vehicles.
+
+Several food items seemed to be associated with the occurrence of illness; tiramisu, dark and white chocolate mousse, fruit salad, and red jelly. They can potentially explain up to 94, 76, 49, 46, and 45 of the 103 cases respectively. Investigators decided to identify their respective role in the occurrence of illness.
+
+From the crude analysis, epidemiologists noticed that the occurrence of gastroenteritis was lower among those attendants who had drunk beer. They also decided to assess if beer had a protective effect on the occurrence of gastroenteritis.
+
+\newpage
+# Question 3:  How would you assess if the chocolate mousses were the vehicles of the illness?
+
+\newpage
+# Question 4. How would you assess if beer had a protective effect on the occurrence of illness?
+## Help questions 3 and 4
+
+Identify the variables which are potential effect modifiers and confounders.
+
+Stata users could use the **csinter** function to identify effect modifiers/confounders. The **epi.2by2** function in the epiR package provides similar functionality. Outcome and exposure variables of interest need to be **factor/categorical variables** prior to performing stratified analysis with this function and also need to be **relevelled from (0,1) to (1,0)** so that they can be correctly organised in a 2 by 2 table.
+
+
+```{r, eval = FALSE}
+# Convert outcome/exposure variables to factor variables and reorder them
+# The variables of interest are identified by their column number but variable names could equally be used
+vars <- colnames(tira_data[,c(2,6,8:10,12:21)])
+
+for (var in vars) {
+  tira_data[,var] <- factor(tira_data[,var],levels = c(1,0)) # levels of the variable are now (1,0) instead of (0,1)
+}
+```
+
+Stratify key exposure variables by exposure to tiramisu. We will use exposure to **wmousse** stratified by tiramisu as an example of the steps required and then run a loop over all variables of interest. 
+
+```{r, eval = FALSE}
+# Make a 3-way table with exposure of interest, the outcome and the stratifying variable in that order
+a <- table(tira_data$wmousse, tira_data$ill, tira_data$tira)
+
+# Use the epi.2by2 function to calculate RRs (by stating method = "cohort.count")
+mh1 <- epi.2by2(a, method = "cohort.count")
+
+# View the output of mh1
+mh1
+
+# We can select specific elements of mh1 using the $ twice as below
+# Crude RR
+mh1$massoc$RR.crude.wald 
+
+# Stratum-specific RR
+mh1$massoc$RR.strata.wald
+
+# Adjusted RR
+mh1$massoc$RR.mh.wald
+
+# We can combine all of those elements in to a single table using rbind
+results <- rbind(mh1$massoc$RR.crude.wald, 
+                          mh1$massoc$RR.strata.wald, 
+                          mh1$massoc$RR.mh.wald)
+
+
+# We can label the rows of this table as below
+rownames(results) <- c("Crude", "Strata 1", "Strata 0", "Adjusted")
+
+results
+
+```
+
+We can now put all of the above steps in a for loop and apply it to all of the variables of interest. 
+
+```{r, eval = FALSE}
+# Select wmousse, dmousse, mousse and beer to pork as variables of interest
+vars <- colnames(tira_data[,c(8:10,12:21)]) 
+
+# Create an empty list to save the output of the loop
+output3 <- list()
+
+
+for (var in vars) {
+  b <- table(tira_data[,var], tira_data$ill, tira_data$tira)
+  mh <- epi.2by2(b, method = "cohort.count")
+  resultstable <- rbind(mh$massoc$RR.crude.wald, 
+                          mh$massoc$RR.strata.wald, 
+                          mh$massoc$RR.mh.wald)
+  rownames(resultstable) <- c("Crude", "Strata 1", "Strata 0", "Adjusted")
+  output3[[var]] <- resultstable
+}
+
+output3 # Gives crude, stratum-specific and adjusted RRs
+```
+
+Have a look at the association between beer and the illness. By stratifying the analysis on tiramisu consumption we can measure the potential protective effect of beer among those who ate tiramisu.   It seems that consumption of beer may reduce the effect of tiramisu consumption on the occurrence of gastroenteritis. The RR does not significantly differ between the two strata (0.8 vs. 1.0 and confidence intervals overlap). But, effect modification may be present. A similar stratification was conducted assessing dose response for tiramisu consumption among beer drinkers and no-beer drinkers.
+
+After stratifying beer consumption by the amount of tiramisu consumed, it appeared that beer consumption reduced the effect of tiramisu on the occurrence of gastroenteritis only among those who had eaten an average amount of tiramisu. This is suggesting that, if the amount of tiramisu was large, consumption of beer no longer reduced the risk of illness when eating tiramisu.
+
+How would you proceed with your analysis?
