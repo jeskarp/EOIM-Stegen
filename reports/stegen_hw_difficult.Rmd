@@ -94,10 +94,11 @@ big_table <- function(data, useNA = "no") {
         cumulative) 
 }
 
+ # Function to provide counts, denominator and proportions (equivalent of attack rate)
 attack_rate <- function(table) {
-  prop <- round(prop.table(table,1),digits = 2)
+  prop <- round(prop.table(table, 1), digits = 2)
   denominator <- rowSums(table) 
-  output <- cbind(Ill = table[,2], N = denominator, Proportions = prop[,2])
+  output <- cbind(Ill = table[, 2], N = denominator, Proportions = prop[, 2])
   return(output)
 }
 ```
