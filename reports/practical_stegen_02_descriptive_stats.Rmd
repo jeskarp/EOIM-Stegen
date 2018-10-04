@@ -1,0 +1,28 @@
+---
+title: An outbreak of gastroenteritis in Stegen, Germany
+author: "Zhian N. Kamvar, Janetta Skarp, Alexander Spina, and Patrick Keating"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Descriptive Analysis
+
+# Question 2
+What are the main characteristics of your study population?
+
+### a) Describe your dataset.
+Look at: 
+
+* the number of observations and variable types
+* mean, median, and maximum values for each variable
+
+### b) Create summary tables with counts and proportions.
+For each variable in the dataset.
+
+### c) Make a box plot and histogram of age.
+
+### d) Number of cases by date of onset.
+Use the incidence package to create an epicurve for this outbreak, providing information on daily incidence. Also create an epicurve stratified by sex.
