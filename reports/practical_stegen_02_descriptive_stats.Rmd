@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r stegen_hw_difficult-4, echo = FALSE, results = 'hide'}
-tira_data <- read.csv(here::here("data", "tirav12.csv"), stringsAsFactors = FALSE)
+tira_data <- read.csv(here::here("data", "tira_clean.csv"), stringsAsFactors = FALSE)
 ```
 
 ```{r stegen_hw_difficult-1, echo = FALSE, eval = FALSE, results = 'hide', message = FALSE, warning = FALSE}
