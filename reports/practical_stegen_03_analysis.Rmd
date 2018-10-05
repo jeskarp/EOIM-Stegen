@@ -21,6 +21,10 @@ gastroenteritis after a high school graduation dinner in Stegen, Germany. The
 [introduction to this case is presented in part 1](./stegen-introduction.html),
 which focussed on initial data inspection and cleaning. [Part 2](./stegen-descriptive.html) focussed on descriptive statistics. This practical will focus on univariable analysis. To identify (the) potential vehicle(s) in the outbreak, proceed with an analytical study where you use statistical tests to investigate the associations of some suspicious food items with the disease.
 
+> If you get stuck with any of the tasks in this practical, additional information for each task can be found in the **Help** section 
+
+## Preparing packages and data
+
 ```{r stegen_hw_difficult-4, echo = FALSE, results = 'hide'}
 tira_data <- read.csv(here::here("data", "tira_clean.csv"), stringsAsFactors = FALSE)
 ```
@@ -83,7 +87,7 @@ Consider effect modification and confounding.
 
 # Question 4. Assess whether beer had a protective effect on the occurrence of illness
 
-# Hints
+# Help
 ## Question 2
 ### a) to d)
 
@@ -93,7 +97,7 @@ The appropriate statistical test for determining a p-value is a Chi-squared test
 
 For our analyses we will use a 95% confidence level, as this is the standard used in public health.
 
-The outputs required for a, c and d are provided by the same function as described below. In Stata, we would normally use the **cstable** and **csinter** commands to calculate food-specific attack rates and the proportion of cases exposed to specific exposures. There are a number of ways of doing this in R. Below you will see two approaches. The first approach gives us the % of cases exposed to tiramisu. 
+The outputs required for a, c and d are provided by the same function as described below. There are a number of ways to calculate food-specific attack rates and the proportion of cases exposed to specific exposures in R. Below you will see two approaches. The first approach gives us the % of cases exposed to tiramisu. 
 
 
 ```{r stegen_hw_difficult-19}
@@ -111,7 +115,7 @@ tira <- cbind(Ill = count[,2], N = denominator, Proportions = prop[,2])
 tira
 ```
 
-Alternatively, we can use a user-written command called single variable analysis.v.02 (developed by Daniel Gardiner Cohort 2015). This gives similar output to the cstable command in Stata.
+Alternatively, we can use a user-written command called single variable analysis.v.02 (developed by Daniel Gardiner Cohort 2015).
 
 ```{r stegen_hw_difficult-20}
 # This function needs to be saved in the same folder as the working directory
@@ -177,7 +181,7 @@ From the crude analysis, epidemiologists noticed that the occurrence of gastroen
 
 Identify the variables which are potential effect modifiers and confounders.
 
-Stata users could use the **csinter** function to identify effect modifiers/confounders. The **epi.2by2** function in the epiR package provides similar functionality. Outcome and exposure variables of interest need to be **factor/categorical variables** prior to performing stratified analysis with this function and also need to be **relevelled from (0,1) to (1,0)** so that they can be correctly organised in a 2 by 2 table.
+The **epi.2by2** function in the epiR package can be used to to identify effect modifiers/confounders. Outcome and exposure variables of interest need to be **factor/categorical variables** prior to performing stratified analysis with this function and also need to be **relevelled from (0,1) to (1,0)** so that they can be correctly organised in a 2 by 2 table.
 
 
 ```{r stegen_hw_difficult-27}
