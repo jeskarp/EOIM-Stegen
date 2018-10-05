@@ -18,6 +18,8 @@ knitr::opts_knit$set(root.dir = here::here())
 
 This practical is a continuation of the analysis concerning the outbreak of gastroenteritis after a high school graduation dinner in Stegen, Germany. The [introduction to this case is presented in part 1](./stegen-introduction.html), which focussed on initial data inspection and cleaning. This practical will focus on descriptive stats including 2x2 tables and epicurves.
 
+> If you get stuck with any of the tasks in this practical, additional information for each task can be found in the **Help** section 
+
 ## Preparing packages and data
 
 ```{r stegen_hw_difficult-4, echo = FALSE, results = 'hide'}
@@ -59,7 +61,6 @@ attack_rate <- function(table) {
 
 # Descriptive Analysis
 
-# Question 2
 What are the main characteristics of your study population?
 
 ### a) Describe your dataset
@@ -76,7 +77,7 @@ For each variable in the dataset.
 ### d) Number of cases by date of onset
 Use the incidence package to create an epicurve for this outbreak, providing information on daily incidence. Also create an epicurve stratified by sex.
 
-# Hints
+# Help
 ### a) Describe your dataset
 
 You can view the structure of your data set using the following commands:
@@ -92,8 +93,6 @@ summary(tira_data)
 Hmisc::describe(tira_data) 
 ```
 
-
-"table", "summary",  and "describe" functions provide similar output to the "tabulate", "summarize", and "codebook" commands in Stata.
 
 "Summary" and "describe" can be applied to:  
 
@@ -145,7 +144,7 @@ big_table(tira_data$sex)
 big_table(tira_data$beer)
 ```
 
-We could use the big_table function on each of our variables, or we could use a **for loop** to loop through our variables (similar to Stata) with the big_table function.
+We could use the big_table function on each of our variables, or we could use a **for loop** to loop through our variables with the big_table function.
 
 ```{r stegen_hw_difficult-12}
 # List the variables of interest and use c() to combine the elements into a vector
