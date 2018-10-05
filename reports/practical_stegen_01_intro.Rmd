@@ -98,9 +98,7 @@ What variables does your dataset contain?
 ### d) Recode data
 Identify variables with missing values (variables that have a records with a value of 9). Recode these to NA.
 
-### e) Create a new age group variable with 2 groups (<30 and >=30)
-
-### f) Save your new dataset
+### e) Save your new dataset
 As a csv file named **tira_clean**.
 
 \newpage
@@ -159,21 +157,7 @@ tira_data$salmon[tira_data$salmon == 9] <- NA
 tira_data$horseradish[tira_data$horseradish == 9] <- NA
 ```
 
-### e) Create a new age group variable with 2 groups (<30 and >=30)
-
-You can create a new age group variable using one of the following approaches:
-```{r stegen_hw_difficult-9}
-# by using ifelse (similar to Excel if statements)
-tira_data$agegroup <- ifelse(tira_data$age >= 30, 1, 0)
-# Two alternative approaches
-# The below are particularly useful when you want to create more than 2 categories
-# by using cut
-tira_data$agegroup <- cut(tira_data$age, c(0,30,150), labels = FALSE) - 1
-# by using findInterval ( levels start at 1, so we have to subtract 1)
-tira_data$agegroup <- findInterval(tira_data$age, c(0,30,150)) - 1
-```
-
-### f) Save your new dataset
+### e) Save your new dataset
 ```{r stegen_hw_difficult-10}
 write.csv(tira_data, file = here::here("data", "tira_clean.csv"))
 ```
