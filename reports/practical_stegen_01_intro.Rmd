@@ -104,7 +104,8 @@ As a csv file named **tira_clean**.
 \newpage
 # Help
 
-### a) Install and load the required packages and functions for this practical
+<details>
+<summary> <b> a) Install and load the required packages and functions for this practical </b> </summary>
 
 Below you can find the commands for installing and loading the required packages.
 
@@ -123,13 +124,18 @@ library("here")
 library("incidence")
 ```
 
-### b) Read in the dataset for this practical
+</details>
+
+<details>
+<summary> <b> b) Read in the dataset for this practical </b> </summary>
 
 ```{r stegen_hw_difficult-4, results = 'hide'}
 tira_data <- read.csv(here::here("data", "tirav12.csv"), stringsAsFactors = FALSE)
 ```
+</details>
 
-### c) Browse your dataset
+<details>
+<summary> <b> c) Browse your dataset </b> </summary>
 *RStudio* has the nice feature that everything is in one browser window, so you can browse your dataset and your code without having to switch between browser windows. 
 
 ```{r stegen_hw_difficult-5, eval = FALSE}
@@ -139,7 +145,10 @@ View(tira_data)
 
 Alternatively, you can also view your dataset by clicking on **tira_data** in the top right "global environment" panel of your *RStudio* browser.  Your global environment is where you can see all the datasets, functions and other things you have loaded in the current session. 
 
-### d) Recode data
+</details>
+
+<details>
+<summary> <b> d) Recode data </b> </summary>
 Use the "describe" command to assess your data and identify variables with missing values. The describe command showed that the variables salmon, pork and horseradish have a few records with a value of 9. These need to be recoded to NA.
 
 * Using the square brackets "[...]" after a variable allows you to subset for certain observations. To recode values of 9 to NA for the pork variable, select observations where pork **(tira_data\$pork)** is equal to 9 **[tira_data\$pork == 9]** and set these observations equal to NA 
@@ -157,10 +166,15 @@ tira_data$salmon[tira_data$salmon == 9] <- NA
 tira_data$horseradish[tira_data$horseradish == 9] <- NA
 ```
 
-### e) Save your new dataset
+</details>
+
+<details>
+<summary> <b> e) Save your new dataset </b> </summary>
 ```{r stegen_hw_difficult-10}
 write.csv(tira_data, file = here::here("data", "tira_clean.csv"))
 ```
+
+</details>
 
 ## Copyright and license
 **Source:**

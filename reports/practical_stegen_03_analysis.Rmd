@@ -19,30 +19,27 @@ knitr::opts_knit$set(root.dir = here::here())
 This practical is a continuation of the analysis concerning the outbreak of 
 gastroenteritis after a high school graduation dinner in Stegen, Germany. The 
 [introduction to this case is presented in part 1](./stegen-introduction.html),
-which focussed on initial data inspection and cleaning. [Part 2](./stegen-descriptive.html) focussed on descriptive statistics. This practical will focus on univariable analysis. To identify (the) potential vehicle(s) in the outbreak, proceed with an analytical study where you use statistical tests to investigate the associations of some suspicious food items with the disease.
+which focussed on initial data inspection and cleaning. [Part 2](./stegen-descriptive.html) focussed on descriptive statistics. This practical will focus on univariable and stratified analysis. To identify (the) potential vehicle(s) in the outbreak, proceed with an analytical study where you use statistical tests to investigate the associations of some suspicious food items with the disease.
 
 > If you get stuck with any of the tasks in this practical, additional information for each task can be found in the **Help** section 
 
 ## Preparing packages and data
 
-```{r stegen_hw_difficult-4, echo = FALSE, results = 'hide'}
-tira_data <- read.csv(here::here("data", "tira_clean.csv"), stringsAsFactors = FALSE)
-```
-
-```{r stegen_hw_difficult-1, echo = FALSE, eval = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+```{r stegen_hw_difficult-1, eval = FALSE, results = 'hide', message = FALSE, warning = FALSE}
 # Installing required packages for the week
-required_packages <- c("epiR", "Hmisc", "epitools", "here") 
+required_packages <- c("epiR", "Hmisc", "epitools", "here", "incidence") 
 install.packages(required_packages)
 ```
 
-```{r stegen_hw_difficult-2, echo = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+```{r stegen_hw_difficult-2, results = 'hide', message = FALSE, warning = FALSE}
 library("epiR")
 library("Hmisc")
 library("epitools")
 library("here")
+library("incidence")
 ```
 
-```{r stegen_hw_difficult-3, echo = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+```{r stegen_hw_difficult-3, results = 'hide', message = FALSE, warning = FALSE}
 # Function to make tables with counts, proportions and cumulative sum
 big_table <- function(data, useNA = "no") {
   count <- table(data, useNA = useNA)
@@ -62,7 +59,11 @@ attack_rate <- function(table) {
 }
 ```
 
-# Question 2:  What is/are the vehicle/s for this outbreak?
+```{r stegen_hw_difficult-4, results = 'hide'}
+tira_data <- read.csv(here::here("data", "tira_clean.csv"), stringsAsFactors = FALSE)
+```
+
+## Question 1:  What is/are the vehicle/s for this outbreak?
 ### a) Compute food-specific attack rates and % of cases exposed
 
 ### b) Choose the appropriate measure of association and the appropriate statistical tests and appropriate level of confidence 
@@ -75,21 +76,19 @@ What would be your suspected food item at this point?
 ### e) Search for any dose response if appropriate
 Consider whether you would recode this variable so it has fewer categories, and actually do it.
 
-**Hint** Use the variable tportion and tabulate it. 
 
 ### f) Interpret the results and identify the outbreak vehicle if any.
 
-# Hints for question 2
-As we are carrying out a cohort study, the appropriate measure of association is relative risk. The appropriate statistical test for determining a p-value is a Chi-squared test of comparison of proportions. For our analyses we will use a 95% confidence level, as this is the standard used in public health.
-
-# Question 3:  Assess whether the chocolate mousses were the vehicles of the illness.
+## Question 2:  Assess whether the chocolate mousses were the vehicles of the illness.
 Consider effect modification and confounding.
 
-# Question 4. Assess whether beer had a protective effect on the occurrence of illness
+## Question 3: Assess whether beer had a protective effect on the occurrence of illness
 
 # Help
-## Question 2
-### a) to d)
+## Question 1
+
+<details>
+<summary> <b> a)-d) </b> </summary>
 
 As we are carrying out a cohort study, the appropriate measure of association is relative risk. 
 
@@ -140,12 +139,18 @@ To calculate attack rates for age and sex, you can use the attack_rate function.
 counts_sex <- table(tira_data$sex, tira_data$ill)
 attack_rate(counts_sex)
 
+# We will be using the same age group split as in section 2, <30 and >30
+tira_data$agegroup <- ifelse(tira_data$age >= 30, 1, 0)
+
 counts_age <- table(tira_data$agegroup, tira_data$ill)
 attack_rate(counts_age)
 
 ```
 
-### e) Search for any dose response if appropriate
+</details>
+
+<details>
+<summary> <b> e) Search for any dose response if appropriate </b> </summary>
 
 Use the variable tportion and tabulate it. Consider whether you would recode this variable so it has fewer categories, and actually do it. 
 
@@ -169,7 +174,10 @@ attack_rate(counts_tportion2)
 
 Here you should be able to see that those who ate 2 or more portions of tiramisu have a higher attack rate than those that ate only 1 portion of tiramisu. Those who ate 1 portion of tiramisu have a higher attack rate than those who ate no tiramisu.
 
-### f) Interpret the results and identify the outbreak vehicle if any
+</details>
+
+<details>
+<summary> <b> f) Interpret the results and identify the outbreak vehicle if any </b> </summary>
 
 Refer to the results of the **sva** output and identify likely vehicles.
 
@@ -177,7 +185,13 @@ Several food items seemed to be associated with the occurrence of illness; tiram
 
 From the crude analysis, epidemiologists noticed that the occurrence of gastroenteritis was lower among those attendants who had drunk beer. They also decided to assess if beer had a protective effect on the occurrence of gastroenteritis.
 
+</details>
+
+
 ## Question 3 and 4
+
+<details>
+<summary> <b> Details </b> </summary>
 
 Identify the variables which are potential effect modifiers and confounders.
 
@@ -255,6 +269,8 @@ output3 # Gives crude, stratum-specific and adjusted RRs
 Have a look at the association between beer and the illness. By stratifying the analysis on tiramisu consumption we can measure the potential protective effect of beer among those who ate tiramisu.   It seems that consumption of beer may reduce the effect of tiramisu consumption on the occurrence of gastroenteritis. The RR does not significantly differ between the two strata (0.8 vs. 1.0 and confidence intervals overlap). But, effect modification may be present. A similar stratification was conducted assessing dose response for tiramisu consumption among beer drinkers and no-beer drinkers.
 
 After stratifying beer consumption by the amount of tiramisu consumed, it appeared that beer consumption reduced the effect of tiramisu on the occurrence of gastroenteritis only among those who had eaten an average amount of tiramisu. This is suggesting that, if the amount of tiramisu was large, consumption of beer no longer reduced the risk of illness when eating tiramisu.
+
+</details>
 
 ## Copyright and license
 

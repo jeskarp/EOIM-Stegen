@@ -83,7 +83,9 @@ For each variable in the dataset.
 * Make sure the dates of onset are stored as "Date" objects
 
 # Help
-### a) Describe your dataset
+
+<details>
+<summary> <b> a) Describe your dataset </b> </summary>
 
 You can view the structure of your data set using the following commands:
 
@@ -119,7 +121,10 @@ describe(tira_data$pork)
 
 ```
 
-### b) Create summary tables with counts and proportions
+</details>
+
+<details>
+<summary> <b> b) Create summary tables with counts and proportions </b> </summary>
 
 We can create individual tables for each variable with the following steps:
 
@@ -164,7 +169,10 @@ twobytwo <- function(x) {
 lapply(tira_data[, vars, drop = FALSE], FUN = twobytwo)
 ```
 
-### c) Make box plot and histogram of age
+</details>
+
+<details>
+<summary> <b> c) Make box plot and histogram of age </b> </summary>
 
 You can use the following to examine the age distribution among people who attended the party, as well as only those and who fell ill. 
 
@@ -209,7 +217,10 @@ tira_data$agegroup <- findInterval(tira_data$age, c(30,150))
 
 ```
 
-### d) Number of cases by date of onset
+</details>
+
+<details>
+<summary> <b> d) Number of cases by date of onset </b> </summary>
 
 You can produce summary tables by person and time (no place variable provided) using the big_table function.
 
@@ -232,7 +243,10 @@ big_table(tira_data$ill)
 big_table(tira_data$dateonset)
 ```
 
-### e) Create an epicurve for this outbreak
+</details>
+
+<details>
+<summary> <b> e) Create an epicurve for this outbreak </b> </summary>
 
 ```{r stegen_hw_difficult-19}
 # Make sure the dates are "Date" objects
@@ -242,6 +256,8 @@ tira_data$dateonset <- as.Date(tira_data$dateonset)
 stegen_incidence <- incidence::incidence(tira_data$dateonset, interval = 1)
 plot(stegen_incidence)
 ```
+
+</details>
 
 ## Copyright and license
 **Source:**
