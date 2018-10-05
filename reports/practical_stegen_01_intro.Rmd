@@ -37,8 +37,8 @@ attended the party.
 
 Overall, 291 responded to enquiries and 103 cases were identified.
 
-\newpage
 ## An introduction to the *R* companion
+
 This text was adapted from the introduction used at the 2016 TSA module.
 
 R packages are bundles of functions which extend the capability of R. Thousands of add-on packages are available in the main online repository (known as CRAN) and many more packages in development can be found on GitHub. They may be installed and updated over the Internet.
@@ -47,26 +47,17 @@ We will mainly use packages which come ready installed with R (base code), but w
 
 ## Setting up
 
-### Required R packages and functions
+### a) Load the required packages and functions for this practical
+The required packages are:
 
-Install and load the required R packages for this practical.
+* epiR
+* Hmisc
+* epitools
+* here
+
+The two required functions are big_table and attack_rate and can be found below.
 
 > **n.b.** you should only need to do this once.
-
-```{r stegen_hw_difficult-1, echo = FALSE, eval = FALSE, results = 'hide', message = FALSE, warning = FALSE}
-# Installing required packages for the week
-required_packages <- c("epiR", "Hmisc", "epitools", "here") 
-install.packages(required_packages)
-```
-
-```{r stegen_hw_difficult-2, echo = FALSE, results = 'hide', message = FALSE, warning = FALSE}
-library("epiR")
-library("Hmisc")
-library("epitools")
-library("here")
-```
-
-Run the following code to make sure that you have all the functions that you need for this practical.
 
 ```{r stegen_hw_difficult-3}
 # Function to make tables with counts, proportions and cumulative sum
@@ -88,34 +79,55 @@ attack_rate <- function(table) {
 }
 ```
 
-The big_table function uses data directly and allows combining of counts, proportions and cumulative sums, thus reducing the number of lines of code required for descriptive analyses. The attack_rate function makes tables that combine counts, proportions and row sums.
+The **big_table** function uses data directly and allows combining of counts, proportions and cumulative sums, thus reducing the number of lines of code required for descriptive analyses. The **attack_rate** function makes tables that combine counts, proportions and row sums.
 
-### The dataset
+# The dataset
 
-In this practical, we will be using the tirav12.csv file located in the data folder.
+In this practical, we will be using the **tirav12.csv** file located in the data folder.
 
-Read in the dataset for this practical.
+### b) Read in the dataset for this practical
+
+# Recoding missing data and creating new variables
+
+### c) Browse your dataset
+What variables does your dataset contain?
+
+### d) Recode data
+Identify variables with missing values (variables that have a records with a value of 9). Recode these to NA.
+
+### e) Create a new age group variable with 2 groups (<30 and >=30)
+
+### f) Save your new dataset
+As a csv file named **tira_clean**.
+
+\newpage
+# Help
+
+### a) Install and load the required packages and functions for this practical
+
+Below you can find the commands for installing and loading the required packages.
+
+```{r stegen_hw_difficult-1, eval = FALSE, message = FALSE, warning = FALSE}
+# Installing required packages for the practical
+required_packages <- c("epiR", "Hmisc", "epitools", "here") 
+install.packages(required_packages)
+```
+
+```{r stegen_hw_difficult-2, results = 'hide', message = FALSE, warning = FALSE}
+# Loading required packages for the practical
+library("epiR")
+library("Hmisc")
+library("epitools")
+library("here")
+```
+
+### b) Read in the dataset for this practical
 
 ```{r stegen_hw_difficult-4, echo = FALSE, results = 'hide'}
 tira_data <- read.csv(here::here("data", "tirav12.csv"), stringsAsFactors = FALSE)
 ```
 
-# Question 1
-### a) Browse your dataset
-What variables does your dataset contain?
-
-### b) Recode data
-Identify variables with missing values (variables that have a records with a value of 9). Recode these to NA.
-
-### c) Create a new age group variable with 2 groups (<30 and >=30)
-
-### d) Save your new dataset
-As a csv file named **tira_clean**.
-
-\newpage
-# Hints
-## Question 1
-### a) Browse your dataset
+### c) Browse your dataset
 *RStudio* has the nice feature that everything is in one browser window, so you can browse your dataset and your code without having to switch between browser windows. 
 
 ```{r stegen_hw_difficult-5, eval = FALSE}
@@ -125,7 +137,7 @@ View(tira_data)
 
 Alternatively, you can also view your dataset by clicking on **tira_data** in the top right "global environment" panel of your *RStudio* browser.  Your global environment is where you can see all the datasets, functions and other things you have loaded in the current session. 
 
-### b) Recode data
+### d) Recode data
 Use the "describe" command to assess your data and identify variables with missing values. The describe command showed that the variables salmon, pork and horseradish have a few records with a value of 9. These need to be recoded to NA.
 
 * Using the square brackets "[...]" after a variable allows you to subset for certain observations. To recode values of 9 to NA for the pork variable, select observations where pork **(tira_data\$pork)** is equal to 9 **[tira_data\$pork == 9]** and set these observations equal to NA 
@@ -143,7 +155,7 @@ tira_data$salmon[tira_data$salmon == 9] <- NA
 tira_data$horseradish[tira_data$horseradish == 9] <- NA
 ```
 
-### c) Create a new age group variable with 2 groups (<30 and >=30)
+### e) Create a new age group variable with 2 groups (<30 and >=30)
 
 You can create a new age group variable using one of the following approaches:
 ```{r stegen_hw_difficult-9}
@@ -157,7 +169,7 @@ tira_data$agegroup <- cut(tira_data$age, c(0,30,150), labels = FALSE) - 1
 tira_data$agegroup <- findInterval(tira_data$age, c(0,30,150)) - 1
 ```
 
-### d) Save your new dataset
+### f) Save your new dataset
 ```{r stegen_hw_difficult-10}
 write.csv(tira_data, file = here::here("data", "tira_clean.csv"))
 ```
