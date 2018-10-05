@@ -45,9 +45,14 @@ R packages are bundles of functions which extend the capability of R. Thousands 
 
 We will mainly use packages which come ready installed with R (base code), but where it makes things easier we will use add-on packages. In addition, we have included a few extra functions to simplify the code required. All the R packages you need for the exercises can be installed over the Internet.
 
+> If you get stuck with any of the tasks in this practical, additional information for each task can be found in the **Help** section 
+
 ## Setting up
 
 ### a) Load the required packages and functions for this practical
+
+> **n.b.** you should only need to do this once.
+
 The required packages are:
 
 * epiR
@@ -55,9 +60,7 @@ The required packages are:
 * epitools
 * here
 
-The two required functions are big_table and attack_rate and can be found below.
-
-> **n.b.** you should only need to do this once.
+The two required functions are **big_table** and **attack_rate** and can be found below.
 
 ```{r stegen_hw_difficult-3}
 # Function to make tables with counts, proportions and cumulative sum
@@ -123,7 +126,7 @@ library("here")
 
 ### b) Read in the dataset for this practical
 
-```{r stegen_hw_difficult-4, echo = FALSE, results = 'hide'}
+```{r stegen_hw_difficult-4, results = 'hide'}
 tira_data <- read.csv(here::here("data", "tirav12.csv"), stringsAsFactors = FALSE)
 ```
 
