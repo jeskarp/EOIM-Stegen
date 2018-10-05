@@ -149,29 +149,24 @@ big_table(tira_data$sex)
 big_table(tira_data$beer)
 ```
 
-We could use the big_table function on each of our variables, or we could use a **for loop** to loop through our variables with the big_table function.
+We could use the big_table function on each of our variables, or we could use a function to go through our variables in one go with the big_table function.
 
 ```{r stegen_hw_difficult-12}
 # List the variables of interest and use c() to combine the elements into a vector
 vars <- c("ill", "tira", "beer", "pork", "salmon")
 
-# Create an empty list to hold the output of your loop
-output <- list() 
-
-# Apply big_table to each element of the object in vars. In this loop, "var" is the indexing variable; any character can be used e.g. "i"
-for (var in vars) {
-  # Within the [], the item before the comma refers to rows and the item after the comma refers to columns
-  total <- big_table(tira_data[,var])
-  # assign the value of your tables (total) to the output list (note: double square brackets "[[]]" are used to subset elements of a list)
-  output[[var]] <- total
+twobytwo <- function(x) {
+  total <- big_table(x)
+  
+  return(total)
 }
 
-output
+lapply(tira_data[, vars, drop = FALSE], FUN = twobytwo)
 ```
 
 ### c) Make box plot and histogram of age
 
-You can use the following to examine the age distribution among people who attended the party, as well as only those and who fell ill and additionally to save the chart. 
+You can use the following to examine the age distribution among people who attended the party, as well as only those and who fell ill. 
 
 ```{r stegen_hw_difficult-13}
 # Boxplot of the age of all who attended the party
@@ -182,21 +177,12 @@ boxplot(tira_data$age)
 ```{r stegen_hw_difficult-14, eval = FALSE}
 # Histogram of the ages of those who attended the party and who fell ill
 
-# To save the histogram, the file path and filename must be specified prior to running the histogram code
-
-# This function changes the "graphics device" to jpeg. You can view the current graphics device using dev.curr().  The default in R Studio is "RStudioGD", i.e. the viewing panel where plots normally occ
-
-jpeg(filename = "N:/MED/IMED-VIE/INFE/Public/CC-INFE-Schmid/EPIET/Learning R/R Case studies/MVA module 2016/Homework/age_cases.jpeg")
-
 # Here we use the hist function to plot the age of cases only (ill == 1)
 # You will see that RStudio creates a jpeg file in your working directory with the above path and filename.
 age_hist_all <- hist(tira_data$age[tira_data$ill == 1],
                      xlab = "Age",
                      ylab = "No. of cases",
                    main = "Histogram of the ages of cases")
-
-# This function closes the graphics device and returns to the default
-dev.off()
 ```
 
 ```{r stegen_hw_difficult-15, echo = FALSE}
