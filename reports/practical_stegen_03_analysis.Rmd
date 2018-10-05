@@ -1,8 +1,12 @@
 ---
-title: "Stegen 03 Univariate and stratified analysis"
-author: "Janetta E. Skarp"
-date: "4 October 2018"
-output: html_document
+title: "An outbreak of gastroenteritis in Stegen, Germany, June 1998 (part 3)"
+author: "Zhian N. Kamvar, Janetta Skarp, Alexander Spina, and Patrick Keating"
+authors: ["Zhian N. Kamvar", "Janetta Skarp", "Alexander Spina", "Patrick Keating"]
+categories: ["practicals"]
+tags: ["level: beginner", "epicurve", "single variable analysis", "2x2 tables", "reproducible research", "gastroenteritis"]
+date: 2018-10-04
+slug: stegen-analysis
+licenses: CC-BY
 ---
 
 ```{r setup, include=FALSE}
