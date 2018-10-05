@@ -22,24 +22,21 @@ This practical is a continuation of the analysis concerning the outbreak of gast
 
 ## Preparing packages and data
 
-```{r stegen_hw_difficult-4, echo = FALSE, results = 'hide'}
-tira_data <- read.csv(here::here("data", "tira_clean.csv"), stringsAsFactors = FALSE)
-```
-
-```{r stegen_hw_difficult-1, echo = FALSE, eval = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+```{r stegen_hw_difficult-1, eval = FALSE, results = 'hide', message = FALSE, warning = FALSE}
 # Installing required packages for the week
-required_packages <- c("epiR", "Hmisc", "epitools", "here") 
+required_packages <- c("epiR", "Hmisc", "epitools", "here", "incidence") 
 install.packages(required_packages)
 ```
 
-```{r stegen_hw_difficult-2, echo = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+```{r stegen_hw_difficult-2, results = 'hide', message = FALSE, warning = FALSE}
 library("epiR")
 library("Hmisc")
 library("epitools")
 library("here")
+library("incidence")
 ```
 
-```{r stegen_hw_difficult-3, echo = FALSE, results = 'hide', message = FALSE, warning = FALSE}
+```{r stegen_hw_difficult-3, results = 'hide', message = FALSE, warning = FALSE}
 # Function to make tables with counts, proportions and cumulative sum
 big_table <- function(data, useNA = "no") {
   count <- table(data, useNA = useNA)
@@ -59,6 +56,10 @@ attack_rate <- function(table) {
 }
 ```
 
+```{r stegen_hw_difficult-4, results = 'hide'}
+tira_data <- read.csv(here::here("data", "tira_clean.csv"), stringsAsFactors = FALSE)
+```
+
 # Descriptive Analysis
 
 What are the main characteristics of your study population?
@@ -74,8 +75,12 @@ For each variable in the dataset.
 
 ### c) Make a box plot and histogram of age
 
-### d) Number of cases by date of onset
-Use the incidence package to create an epicurve for this outbreak, providing information on daily incidence. Also create an epicurve stratified by sex.
+### d) Produce a table of the number of cases by date of onset
+
+### e) Create an epicurve for this outbreak
+
+* Use the incidence package, providing information on daily incidence
+* Make sure the dates of onset are stored as "Date" objects
 
 # Help
 ### a) Describe your dataset
@@ -239,6 +244,17 @@ big_table(tira_data$ill)
 
 # Table 4: Descriptive epidemiology: Cases by date of onset of illness
 big_table(tira_data$dateonset)
+```
+
+### e) Create an epicurve for this outbreak
+
+```{r stegen_hw_difficult-19}
+# Make sure the dates are "Date" objects
+tira_data$dateonset <- as.Date(tira_data$dateonset)
+
+# Create the epicurve
+stegen_incidence <- incidence::incidence(tira_data$dateonset, interval = 1)
+plot(stegen_incidence)
 ```
 
 ## Copyright and license

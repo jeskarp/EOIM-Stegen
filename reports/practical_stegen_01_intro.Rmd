@@ -112,7 +112,7 @@ Below you can find the commands for installing and loading the required packages
 
 ```{r stegen_hw_difficult-1, eval = FALSE, message = FALSE, warning = FALSE}
 # Installing required packages for the practical
-required_packages <- c("epiR", "Hmisc", "epitools", "here") 
+required_packages <- c("epiR", "Hmisc", "epitools", "here", "incidence") 
 install.packages(required_packages)
 ```
 
@@ -122,6 +122,7 @@ library("epiR")
 library("Hmisc")
 library("epitools")
 library("here")
+library("incidence")
 ```
 
 ### b) Read in the dataset for this practical
