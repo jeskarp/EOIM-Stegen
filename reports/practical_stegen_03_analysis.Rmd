@@ -243,27 +243,32 @@ results
 
 ```
 
-We can now put all of the above steps in a for loop and apply it to all of the variables of interest. 
+We can write a function incorporating all these steps and run all of the variables of interest in one go. 
 
-```{r stegen_hw_difficult-29}
-# Select wmousse, dmousse, mousse and beer to pork as variables of interest
+```{r rr_function}
+strata_risk <- function(var, case, strat) {
+  a <- table(var, case, strat)
+
+  mhtable <- epiR::epi.2by2(a, method = "cohort.count")
+  
+  results <- rbind(
+    mhtable$massoc$RR.crude.wald,
+    mhtable$massoc$RR.strata.wald,
+    mhtable$massoc$RR.mh.wald
+  )
+
+  rownames(results) <- c("Crude", "Strata 1", "Strata 0", "Adjusted")
+
+  results
+}
+```
+
+```{r mhrr_table}
+# List the exposure variables
 vars <- c("wmousse", "dmousse", "mousse", "beer", "redjelly", "fruitsalad", "tomato", "mince", "salmon", "horseradish", "chickenwin", "roastbeef", "pork") 
 
-# Create an empty list to save the output of the loop
-output3 <- list()
-
-
-for (var in vars) {
-  b <- table(tira_data[,var], tira_data$ill, tira_data$tira)
-  mh <- epiR::epi.2by2(b, method = "cohort.count")
-  resultstable <- rbind(mh$massoc$RR.crude.wald, 
-                          mh$massoc$RR.strata.wald, 
-                          mh$massoc$RR.mh.wald)
-  rownames(resultstable) <- c("Crude", "Strata 1", "Strata 0", "Adjusted")
-  output3[[var]] <- resultstable
-}
-
-output3 # Gives crude, stratum-specific and adjusted RRs
+# Run strata_risk for each one using tiramisu as strata
+lapply(tira_data[vars], strata_risk, case = tira_data$ill, strat = tira_data$tira)
 ```
 
 Have a look at the association between beer and the illness. By stratifying the analysis on tiramisu consumption we can measure the potential protective effect of beer among those who ate tiramisu.   It seems that consumption of beer may reduce the effect of tiramisu consumption on the occurrence of gastroenteritis. The RR does not significantly differ between the two strata (0.8 vs. 1.0 and confidence intervals overlap). But, effect modification may be present. A similar stratification was conducted assessing dose response for tiramisu consumption among beer drinkers and no-beer drinkers.
